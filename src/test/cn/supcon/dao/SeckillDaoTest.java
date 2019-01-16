@@ -8,7 +8,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
 
-import static org.junit.Assert.*;
+import java.util.Date;
+import java.util.List;
+
 
 
 /**
@@ -34,8 +36,20 @@ public class SeckillDaoTest {
     }
 
     @Test
-    public void testReduceNumber() throws Exception {
+    public void testQueryAll() throws Exception {
+        List<Seckill> seckills = seckillDao.queryAll(0, 100);
+        for (Seckill seckill : seckills) {
+            System.out.println(seckill);
+        }
 
+    }
+
+    @Test
+    public void testReduceNumber() throws Exception {
+        Date killTime = new Date();
+        System.out.println(killTime);
+        int updateCount = seckillDao.reduceNumber(1000L, killTime);
+        System.out.println(updateCount);
     }
 
 }
