@@ -4,6 +4,8 @@ package cn.supcon.service;
 import cn.supcon.dto.Exposer;
 import cn.supcon.dto.SeckillExecution;
 import cn.supcon.entity.Seckill;
+import cn.supcon.exception.RepeatKillException;
+import cn.supcon.exception.SeckillCloseException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -61,6 +63,27 @@ public class SeckillServiceTest {
         String md5 = "c2a6648be7e7cd776bf16212a2f8d81c";
         SeckillExecution execution = seckillService.executeSeckill(id, phone, md5);
         logger.info("result={}", execution);
+    }
+
+    @Test
+    public void testSeckillLogic() throws Exception {
+        long id = 1002;
+        Exposer exposer = seckillService.exportSeckillUrl(id);
+        if (exposer.isExposed()) {
+            logger.info("exposer={}", exposer);
+            long phone = 17867854567L;
+            String md5 = exposer.getMd5();
+            try {
+                SeckillExecution execution = seckillService.executeSeckill(id, phone, md5);
+                logger.info("result={}", execution);
+            }catch (RepeatKillException e1) {
+                logger.error(e1.getMessage());
+            } catch (SeckillCloseException e2) {
+                logger.error(e2.getMessage());
+            }
+        } else {
+            logger.warn("exposer={}", exposer);
+        }
     }
 
 
