@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
@@ -84,6 +85,19 @@ public class SeckillServiceTest {
         } else {
             logger.warn("exposer={}", exposer);
         }
+    }
+
+    @Test
+    public void executeSeckillProcedure() {
+        long secillId = 1002;
+        long phoen = 12122228888L;
+        Exposer exposer = seckillService.exportSeckillUrl(secillId);
+        if (exposer.isExposed()) {
+            String md5 = exposer.getMd5();
+            SeckillExecution seckillExecution = seckillService.executeSeckillProcedure(secillId, phoen, md5);
+            logger.info(seckillExecution.getStateInfo());
+        }
+
     }
 
 
