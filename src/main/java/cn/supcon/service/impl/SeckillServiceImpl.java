@@ -2,6 +2,7 @@ package cn.supcon.service.impl;
 
 import cn.supcon.dao.SeckillDao;
 import cn.supcon.dao.SuccessKilledDao;
+import cn.supcon.dao.chche.RedisDao;
 import cn.supcon.dto.Exposer;
 import cn.supcon.dto.SeckillExecution;
 import cn.supcon.entity.Seckill;
@@ -33,6 +34,9 @@ public class SeckillServiceImpl implements SeckillService {
     @Autowired
     private SuccessKilledDao successKilledDao;
 
+    @Autowired
+    private RedisDao redisDao;
+
 
     // md5 盐值支付串，用户混淆md5
     private final String slat = "sdfkgdadf21412421^&*";
@@ -51,9 +55,16 @@ public class SeckillServiceImpl implements SeckillService {
     @Override
     public Exposer exportSeckillUrl(long seckillId) {
 
-        Seckill seckill = seckillDao.queryById(seckillId);
+        // 1. 访问redis
+        Seckill seckill = redisDao.getSeckill(seckillId);
         if (seckill == null) {
-            return new Exposer(false, seckillId);
+            // 2. 访问数据库
+            seckill = seckillDao.queryById(seckillId);
+            if (seckill == null) {
+                return new Exposer(false, seckillId);
+            } else {
+                redisDao.putSeckill(seckill);
+            }
         }
         Date startTime = seckill.getStartTime();
         Date endTime = seckill.getEndTime();
